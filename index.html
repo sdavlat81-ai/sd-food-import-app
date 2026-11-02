@@ -3,31 +3,34 @@
 <html lang="uz">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#080808">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#090909">
 <title>SD Food Import</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#090909;color:#fff;font-family:Arial,sans-serif}
-header{background:#111;padding:20px;border-bottom:1px solid #b99442}
-.logo{text-align:center;color:#d8b45b;font-size:25px;font-weight:bold}
-.crown{text-align:center;font-size:35px}
-header p{text-align:center;color:#aaa;font-size:12px;letter-spacing:3px}
+body{margin:0;background:#090909;color:white;font-family:Arial,sans-serif}
+header{text-align:center;padding:22px;background:#141414;border-bottom:1px solid #c5a04c}
+.crown{font-size:38px;color:#d9b65e}
+.logo{font-size:25px;font-weight:bold;color:#d9b65e}
+header p{font-size:11px;color:#aaa;letter-spacing:3px}
 .search{padding:15px}
-input{width:100%;padding:15px;border:1px solid #b99442;border-radius:12px;background:#181818;color:white;font-size:16px}
-.categories{display:flex;gap:10px;overflow:auto;padding:5px 15px 15px}
-.categories button{white-space:nowrap;background:#191919;color:#d8b45b;border:1px solid #b99442;padding:10px 16px;border-radius:20px}
-h2{padding:0 15px;color:#d8b45b}
+input{width:100%;padding:14px;border-radius:10px;background:#191919;border:1px solid #a88743;color:white;font-size:16px}
+.categories{display:flex;gap:8px;overflow:auto;padding:0 15px 15px}
+.categories button{white-space:nowrap;background:#191919;color:#d9b65e;border:1px solid #a88743;padding:10px 14px;border-radius:20px}
+h2{color:#d9b65e;padding:0 15px}
 .products{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:12px}
-.card{background:#171717;border:1px solid #493b20;border-radius:14px;padding:12px}
-.photo{height:110px;background:#222;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:55px}
-.card h3{font-size:15px;margin:12px 0 8px}
-.price{color:#d8b45b;font-weight:bold;font-size:14px;margin:7px 0}
-.wholesale{font-size:12px;color:#aaa}
-.card button,.checkout{width:100%;padding:11px;background:linear-gradient(90deg,#9d792f,#e4c36d);border:0;border-radius:9px;font-weight:bold;color:#111;margin-top:10px}
-.cart{position:fixed;bottom:0;left:0;right:0;background:#171717;border-top:1px solid #b99442;padding:14px;display:flex;justify-content:space-between;align-items:center}
-.cart strong{color:#e3bd5c}
-main{padding-bottom:85px}
+.card{background:#171717;border:1px solid #554521;border-radius:13px;padding:11px;min-width:0}
+.photo{height:110px;background:#222;border-radius:9px;display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:45px}
+.photo img{width:100%;height:100%;object-fit:contain}
+.card h3{font-size:15px}
+.price{color:#e1bd64;font-weight:bold;font-size:14px}
+.wholesale{color:#aaa;font-size:12px;margin-top:7px}
+.card button,.checkout{width:100%;padding:11px;margin-top:10px;background:linear-gradient(90deg,#a17b30,#e5c36e);border:0;border-radius:8px;color:#111;font-weight:bold}
+.cart{position:fixed;bottom:0;left:0;right:0;background:#171717;border-top:1px solid #b99442;padding:13px;display:flex;justify-content:space-between;align-items:center}
+.cart strong{color:#e1bd64}
+main{padding-bottom:100px}
+.empty{text-align:center;color:#aaa;padding:35px 15px;grid-column:1/-1}
+#cartDetails{padding:15px}
 </style>
 </head>
 <body>
@@ -51,6 +54,8 @@ main{padding-bottom:85px}
 <main>
 <h2>✦ Mahsulotlar katalogi</h2>
 <div class="products" id="products"></div>
+<h2>✦ Savatingiz</h2>
+<div id="cartDetails"></div>
 </main>
 
 <div class="cart">
@@ -59,37 +64,86 @@ main{padding-bottom:85px}
 </div>
 
 <script>
-const items=[
-{name:"Coca-Cola",price:12000,wholesale:10500,cat:"Ichimliklar",emoji:"🥤"},
-{name:"Pepsi",price:11000,wholesale:9500,cat:"Ichimliklar",emoji:"🥤"},
-{name:"Lay's chips",price:15000,wholesale:12500,cat:"Shirinliklar",emoji:"🍟"},
-{name:"Shokolad",price:18000,wholesale:15000,cat:"Shirinliklar",emoji:"🍫"},
-{name:"Mineral suv",price:5000,wholesale:4000,cat:"Ichimliklar",emoji:"💧"},
-{name:"Biskvit",price:14000,wholesale:11500,cat:"Oziq-ovqat",emoji:"🍪"}
-];
-let selected="Barchasi";
+let selected='Barchasi';
 let cart=[];
-function filter(cat){selected=cat;render()}
+let items=[];
+
+function loadProducts(){
+try{
+items=JSON.parse(localStorage.getItem('sd_products')||'[]');
+if(!Array.isArray(items))items=[];
+}catch(e){items=[]}
+render();
+}
+
+function filter(cat){
+selected=cat;
+render();
+}
+
+function money(n){
+return Number(n||0).toLocaleString('uz-UZ')+' so‘m';
+}
+
 function render(){
-let q=document.getElementById("search").value.toLowerCase();
-let list=items.filter(x=>(selected==="Barchasi"||x.cat===selected)&&x.name.toLowerCase().includes(q));
-document.getElementById("products").innerHTML=list.map((x)=>{
-let i=items.indexOf(x);
+const q=document.getElementById('search').value.toLowerCase();
+const list=items.filter(x=>{
+const name=String(x.name||'').toLowerCase();
+const category=String(x.cat||'Barchasi');
+return (selected==='Barchasi'||category===selected)&&name.includes(q);
+});
+
+document.getElementById('products').innerHTML=list.map(x=>{
+const i=items.indexOf(x);
+const photo=x.image
+?'<img src="'+escapeHTML(x.image)+'" alt="">'
+:'📦';
 return `<div class="card">
-<div class="photo">${x.emoji}</div>
-<h3>${x.name}</h3>
-<div class="price">Oddiy: ${x.price.toLocaleString("uz-UZ")} so'm</div>
-<div class="wholesale">Ulgurji: ${x.wholesale.toLocaleString("uz-UZ")} so'm</div>
+<div class="photo">${photo}</div>
+<h3>${escapeHTML(x.name)}</h3>
+<div class="price">Oddiy: ${money(x.price)}</div>
+<div class="wholesale">Ulgurji: ${money(x.wholesale)}</div>
 <button onclick="add(${i})">Savatga qo‘shish</button>
 </div>`;
-}).join("");
+}).join('')||'<div class="empty">Hozircha mahsulot yo‘q. Admin paneldan mahsulot qo‘shing.</div>';
 }
-function add(i){cart.push(items[i]);updateCart()}
+
+function add(i){
+if(!items[i])return;
+cart.push(items[i]);
+updateCart();
+}
+
 function updateCart(){
-document.getElementById("count").innerText=cart.length;
-document.getElementById("total").innerText=cart.reduce((s,x)=>s+x.price,0).toLocaleString("uz-UZ")+" so'm";
+document.getElementById('count').innerText=cart.length;
+document.getElementById('total').innerText=money(cart.reduce((s,x)=>s+Number(x.price||0),0));
+
+document.getElementById('cartDetails').innerHTML=cart.length
+?cart.map((x,i)=>`<div style="padding:10px;border-bottom:1px solid #554521">
+${escapeHTML(x.name)} — ${money(x.price)}
+<button onclick="removeCart(${i})" style="float:right">✕</button>
+</div>`).join('')
+:'<p style="color:#aaa">Savatingiz hozircha bo‘sh.</p>';
 }
-render();
+
+function removeCart(i){
+cart.splice(i,1);
+updateCart();
+}
+
+function escapeHTML(s){
+return String(s||'').replace(/[&<>"']/g,c=>({
+'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+}[c]));
+}
+
+window.addEventListener('storage',e=>{
+if(e.key==='sd_products')loadProducts();
+});
+window.addEventListener('focus',loadProducts);
+
+loadProducts();
+updateCart();
 </script>
 </body>
 </html>

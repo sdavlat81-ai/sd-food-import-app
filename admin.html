@@ -1,0 +1,130 @@
+
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SD Food Import — Admin</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#090909;color:white;font-family:Arial}
+header{padding:22px;background:#151515;border-bottom:1px solid #c5a04c;text-align:center}
+header h2{color:#d9b65e;margin:5px}
+header p{color:#aaa;font-size:12px}
+nav{display:flex;overflow:auto;background:#151515}
+nav button{flex:1;min-width:100px;padding:15px 8px;background:none;border:0;color:#d9b65e}
+section{padding:16px}
+h3{color:#d9b65e}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.stat,.panel{background:#191919;border:1px solid #554521;border-radius:12px;padding:16px}
+.stat strong{display:block;color:#e3c16c;font-size:22px;margin-top:8px}
+input,select{width:100%;padding:13px;margin:7px 0;background:#222;color:white;border:1px solid #a88743;border-radius:8px}
+.action{background:#c6a04d;color:#111;border:0;padding:13px;border-radius:8px;font-weight:bold;width:100%;margin-top:8px}
+.item{padding:12px;background:#191919;border-bottom:1px solid #44391f;margin:8px 0;border-radius:8px}
+.small{font-size:12px;color:#aaa}
+.hidden{display:none}
+</style>
+</head>
+<body>
+<header>
+<div style="font-size:35px">♛</div>
+<h2>SD FOOD IMPORT</h2>
+<p>ADMIN CONTROL PANEL</p>
+</header>
+
+<nav>
+<button onclick="show('home')">Bosh sahifa</button>
+<button onclick="show('products')">Mahsulotlar</button>
+<button onclick="show('orders')">Buyurtmalar</button>
+<button onclick="show('customers')">Mijozlar</button>
+</nav>
+
+<section id="home">
+<h3>✦ Boshqaruv paneli</h3>
+<div class="stats">
+<div class="stat">Mahsulotlar<strong id="productCount">0</strong></div>
+<div class="stat">Buyurtmalar<strong id="orderCount">0</strong></div>
+<div class="stat">Mijozlar<strong id="customerCount">0</strong></div>
+<div class="stat">Savdo<strong id="sales">0 so'm</strong></div>
+</div>
+</section>
+
+<section id="products" class="hidden">
+<h3>✦ Mahsulot qo‘shish</h3>
+<div class="panel">
+<input id="name" placeholder="Mahsulot nomi">
+<input id="price" type="number" placeholder="Oddiy narx">
+<input id="wholesale" type="number" placeholder="Ulgurji narx">
+<input id="image" placeholder="Rasm URL manzili (ixtiyoriy)">
+<button class="action" onclick="addProduct()">Mahsulotni saqlash</button>
+</div>
+<h3>Mahsulotlar ro‘yxati</h3>
+<div id="productList"></div>
+</section>
+
+<section id="orders" class="hidden">
+<h3>✦ Buyurtmalar</h3>
+<div id="orderList">Hozircha buyurtmalar yo‘q.</div>
+</section>
+
+<section id="customers" class="hidden">
+<h3>✦ Mijozlar</h3>
+<div id="customerList">Hozircha mijozlar yo‘q.</div>
+</section>
+
+<script>
+let products=JSON.parse(localStorage.getItem('sd_products')||'[]');
+let orders=JSON.parse(localStorage.getItem('sd_orders')||'[]');
+let customers=JSON.parse(localStorage.getItem('sd_customers')||'[]');
+
+function save(){
+localStorage.setItem('sd_products',JSON.stringify(products));
+update();
+}
+function show(id){
+['home','products','orders','customers'].forEach(x=>
+document.getElementById(x).classList.toggle('hidden',x!==id));
+}
+function addProduct(){
+let n=document.getElementById('name').value.trim();
+let p=Number(document.getElementById('price').value);
+let w=Number(document.getElementById('wholesale').value);
+let img=document.getElementById('image').value.trim();
+if(!n||p<=0||w<=0){alert('Barcha majburiy maydonlarni to‘ldiring');return}
+products.push({name:n,price:p,wholesale:w,image:img});
+save();
+document.getElementById('name').value='';
+document.getElementById('price').value='';
+document.getElementById('wholesale').value='';
+document.getElementById('image').value='';
+}
+function removeProduct(i){
+if(confirm('Mahsulotni o‘chirasizmi?')){
+products.splice(i,1);save();
+}
+}
+function update(){
+document.getElementById('productCount').innerText=products.length;
+document.getElementById('orderCount').innerText=orders.length;
+document.getElementById('customerCount').innerText=customers.length;
+document.getElementById('sales').innerText=orders.reduce((s,o)=>s+(Number(o.total)||0),0).toLocaleString('uz-UZ')+' so‘m';
+document.getElementById('productList').innerHTML=products.map((p,i)=>
+`<div class="item"><b>${escapeHTML(p.name)}</b>
+<div class="small">Oddiy: ${p.price.toLocaleString('uz-UZ')} so‘m</div>
+<div class="small">Ulgurji: ${p.wholesale.toLocaleString('uz-UZ')} so‘m</div>
+<button class="action" onclick="removeProduct(${i})">O‘chirish</button></div>`
+).join('')||'Mahsulotlar yo‘q';
+document.getElementById('orderList').innerHTML=orders.map(o=>
+`<div class="item">${escapeHTML(o.customer||'Mijoz')} — ${Number(o.total||0).toLocaleString('uz-UZ')} so‘m</div>`
+).join('')||'Hozircha buyurtmalar yo‘q.';
+document.getElementById('customerList').innerHTML=customers.map(c=>
+`<div class="item">${escapeHTML(c.name||'Mijoz')} — ${escapeHTML(c.phone||'')}</div>`
+).join('')||'Hozircha mijozlar yo‘q.';
+}
+function escapeHTML(s){
+return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+update();
+</script>
+</body>
+</html>

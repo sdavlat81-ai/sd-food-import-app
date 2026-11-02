@@ -1,0 +1,95 @@
+
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#080808">
+<title>SD Food Import</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#090909;color:#fff;font-family:Arial,sans-serif}
+header{background:#111;padding:20px;border-bottom:1px solid #b99442}
+.logo{text-align:center;color:#d8b45b;font-size:25px;font-weight:bold}
+.crown{text-align:center;font-size:35px}
+header p{text-align:center;color:#aaa;font-size:12px;letter-spacing:3px}
+.search{padding:15px}
+input{width:100%;padding:15px;border:1px solid #b99442;border-radius:12px;background:#181818;color:white;font-size:16px}
+.categories{display:flex;gap:10px;overflow:auto;padding:5px 15px 15px}
+.categories button{white-space:nowrap;background:#191919;color:#d8b45b;border:1px solid #b99442;padding:10px 16px;border-radius:20px}
+h2{padding:0 15px;color:#d8b45b}
+.products{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:12px}
+.card{background:#171717;border:1px solid #493b20;border-radius:14px;padding:12px}
+.photo{height:110px;background:#222;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:55px}
+.card h3{font-size:15px;margin:12px 0 8px}
+.price{color:#d8b45b;font-weight:bold;font-size:14px;margin:7px 0}
+.wholesale{font-size:12px;color:#aaa}
+.card button,.checkout{width:100%;padding:11px;background:linear-gradient(90deg,#9d792f,#e4c36d);border:0;border-radius:9px;font-weight:bold;color:#111;margin-top:10px}
+.cart{position:fixed;bottom:0;left:0;right:0;background:#171717;border-top:1px solid #b99442;padding:14px;display:flex;justify-content:space-between;align-items:center}
+.cart strong{color:#e3bd5c}
+main{padding-bottom:85px}
+</style>
+</head>
+<body>
+<header>
+<div class="crown">♛</div>
+<div class="logo">SD FOOD IMPORT</div>
+<p>PREMIUM QUALITY • BEST PRICE</p>
+</header>
+
+<div class="search">
+<input id="search" placeholder="Mahsulot qidirish..." oninput="render()">
+</div>
+
+<div class="categories">
+<button onclick="filter('Barchasi')">Barchasi</button>
+<button onclick="filter('Ichimliklar')">Ichimliklar</button>
+<button onclick="filter('Shirinliklar')">Shirinliklar</button>
+<button onclick="filter('Oziq-ovqat')">Oziq-ovqat</button>
+</div>
+
+<main>
+<h2>✦ Mahsulotlar katalogi</h2>
+<div class="products" id="products"></div>
+</main>
+
+<div class="cart">
+<div>🛒 Savat: <strong id="count">0</strong> ta</div>
+<strong id="total">0 so‘m</strong>
+</div>
+
+<script>
+const items=[
+{name:"Coca-Cola",price:12000,wholesale:10500,cat:"Ichimliklar",emoji:"🥤"},
+{name:"Pepsi",price:11000,wholesale:9500,cat:"Ichimliklar",emoji:"🥤"},
+{name:"Lay's chips",price:15000,wholesale:12500,cat:"Shirinliklar",emoji:"🍟"},
+{name:"Shokolad",price:18000,wholesale:15000,cat:"Shirinliklar",emoji:"🍫"},
+{name:"Mineral suv",price:5000,wholesale:4000,cat:"Ichimliklar",emoji:"💧"},
+{name:"Biskvit",price:14000,wholesale:11500,cat:"Oziq-ovqat",emoji:"🍪"}
+];
+let selected="Barchasi";
+let cart=[];
+function filter(cat){selected=cat;render()}
+function render(){
+let q=document.getElementById("search").value.toLowerCase();
+let list=items.filter(x=>(selected==="Barchasi"||x.cat===selected)&&x.name.toLowerCase().includes(q));
+document.getElementById("products").innerHTML=list.map((x)=>{
+let i=items.indexOf(x);
+return `<div class="card">
+<div class="photo">${x.emoji}</div>
+<h3>${x.name}</h3>
+<div class="price">Oddiy: ${x.price.toLocaleString("uz-UZ")} so'm</div>
+<div class="wholesale">Ulgurji: ${x.wholesale.toLocaleString("uz-UZ")} so'm</div>
+<button onclick="add(${i})">Savatga qo‘shish</button>
+</div>`;
+}).join("");
+}
+function add(i){cart.push(items[i]);updateCart()}
+function updateCart(){
+document.getElementById("count").innerText=cart.length;
+document.getElementById("total").innerText=cart.reduce((s,x)=>s+x.price,0).toLocaleString("uz-UZ")+" so'm";
+}
+render();
+</script>
+</body>
+</html>

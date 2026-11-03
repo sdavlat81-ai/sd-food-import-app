@@ -4,146 +4,238 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#090909">
-<title>SD Food Import</title>
+<meta name="theme-color" content="#050505">
+<title>SD FOOD IMPORT</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#090909;color:white;font-family:Arial,sans-serif}
-header{text-align:center;padding:22px;background:#141414;border-bottom:1px solid #c5a04c}
-.crown{font-size:38px;color:#d9b65e}
-.logo{font-size:25px;font-weight:bold;color:#d9b65e}
-header p{font-size:11px;color:#aaa;letter-spacing:3px}
-.search{padding:15px}
-input{width:100%;padding:14px;border-radius:10px;background:#191919;border:1px solid #a88743;color:white;font-size:16px}
-.categories{display:flex;gap:8px;overflow:auto;padding:0 15px 15px}
-.categories button{white-space:nowrap;background:#191919;color:#d9b65e;border:1px solid #a88743;padding:10px 14px;border-radius:20px}
-h2{color:#d9b65e;padding:0 15px}
-.products{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:12px}
-.card{background:#171717;border:1px solid #554521;border-radius:13px;padding:11px;min-width:0}
-.photo{height:110px;background:#222;border-radius:9px;display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:45px}
+body{margin:0;background:#050505;color:#fff;font-family:Arial,sans-serif;padding-bottom:82px}
+:root{--gold:#edc45d;--gold2:#a77b26;--panel:#111318;--line:#51401e}
+header{height:70px;display:flex;align-items:center;justify-content:space-between;padding:0 17px;border-bottom:1px solid var(--line);background:#080808;position:sticky;top:0;z-index:5}
+.brand{text-align:center;color:var(--gold);font-family:Georgia,serif;font-size:21px;font-weight:bold}
+.brand small{display:block;font-size:10px;letter-spacing:2px}
+.menu,.headbtn{background:none;border:0;color:var(--gold);font-size:24px}
+.headbtn{font-size:21px}
+main{max-width:650px;margin:auto;padding:12px}
+.page{display:none}.page.active{display:block}
+.search{display:flex;gap:8px;margin:8px 0 14px}
+input{width:100%;padding:14px;border:1px solid #343a45;background:#151922;color:white;border-radius:14px;font-size:15px}
+.hero{min-height:155px;border:1px solid #8c6729;border-radius:18px;padding:20px 15px;background:radial-gradient(circle at 90% 20%,#654315,#17100a 50%,#090909);display:flex;align-items:center;justify-content:space-between;overflow:hidden}
+.hero h2{font-size:21px;margin:0 0 8px;max-width:230px}
+.hero p{color:var(--gold);font-size:13px}
+.hero button,.goldbtn{background:linear-gradient(110deg,#a97920,#ffdc78,#c18a2d);color:#17100a;border:0;border-radius:30px;padding:13px 20px;font-weight:bold}
+.heroicon{font-size:66px}
+.quick{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:14px 0}
+.quick button{background:#111;border:1px solid var(--line);border-radius:13px;color:var(--gold);padding:13px 3px;font-size:23px}
+.quick span{display:block;font-size:10px;color:white;margin-top:7px}
+.sectiontitle{display:flex;justify-content:space-between;align-items:center;margin:20px 2px 12px}
+.sectiontitle h3{margin:0;font-size:17px}
+.sectiontitle button{background:none;border:0;color:var(--gold)}
+.categories{display:flex;gap:8px;overflow:auto;padding:5px 0 14px}
+.categories button{white-space:nowrap;border:1px solid var(--line);background:#111;color:#ddd;border-radius:20px;padding:10px 14px}
+.categories button.active{background:linear-gradient(110deg,#a97920,#f5ce70);color:#111}
+.products{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+.card{background:linear-gradient(145deg,#191919,#0d0e11);border:1px solid #51401e;border-radius:15px;padding:9px;min-width:0}
+.photo{height:125px;background:#f1f1f1;border-radius:10px;display:flex;align-items:center;justify-content:center;overflow:hidden;color:#111;font-size:45px}
 .photo img{width:100%;height:100%;object-fit:contain}
-.card h3{font-size:15px}
-.price{color:#e1bd64;font-weight:bold;font-size:14px}
-.wholesale{color:#aaa;font-size:12px;margin-top:7px}
-.card button,.checkout{width:100%;padding:11px;margin-top:10px;background:linear-gradient(90deg,#a17b30,#e5c36e);border:0;border-radius:8px;color:#111;font-weight:bold}
-.cart{position:fixed;bottom:0;left:0;right:0;background:#171717;border-top:1px solid #b99442;padding:13px;display:flex;justify-content:space-between;align-items:center}
-.cart strong{color:#e1bd64}
-main{padding-bottom:100px}
-.empty{text-align:center;color:#aaa;padding:35px 15px;grid-column:1/-1}
-#cartDetails{padding:15px}
+.card h4{font-size:14px;margin:10px 0 6px}
+.price{color:var(--gold);font-weight:bold;font-size:14px}
+.wholesale{font-size:11px;color:#aaa;margin-top:5px}
+.card button{width:100%;margin-top:10px;border:0;border-radius:9px;padding:10px;background:linear-gradient(110deg,#b17d24,#f4cd6c);font-weight:bold}
+.empty{text-align:center;color:#aaa;padding:30px;grid-column:1/-1}
+.bottom{position:fixed;bottom:0;left:0;right:0;height:72px;background:#090909;border-top:1px solid var(--line);display:flex;justify-content:space-around;z-index:10}
+.bottom button{background:none;border:0;color:#aaa;font-size:19px;min-width:60px}
+.bottom button.active{color:var(--gold)}
+.bottom span{display:block;font-size:10px;margin-top:4px}
+.cartrow{display:flex;align-items:center;gap:10px;background:#15171c;border:1px solid #343434;padding:10px;border-radius:12px;margin-bottom:10px}
+.cartphoto{width:65px;height:65px;object-fit:contain;background:white;border-radius:9px}
+.cartinfo{flex:1;min-width:0;font-size:13px}
+.qty{display:flex;align-items:center;gap:12px;margin-top:8px}
+.qty button{border:0;border-radius:50%;width:27px;height:27px;background:#272727;color:var(--gold);font-size:17px}
+.totalbox{border:1px solid var(--line);background:#15120c;border-radius:14px;padding:16px;margin-top:14px}
+.totalbox strong{color:var(--gold);font-size:20px}
+.goldbtn{width:100%;margin-top:14px;font-size:15px}
+.field{margin:13px 0}
+.field label{display:block;font-size:13px;color:var(--gold);margin-bottom:7px}
+.profilebox{background:#151515;border:1px solid var(--line);border-radius:15px;padding:18px;margin:12px 0}
+.profileitem{padding:15px 3px;border-bottom:1px solid #333}
+.notice{font-size:12px;color:#aaa;line-height:1.5}
 </style>
 </head>
 <body>
+
 <header>
-<div class="crown">♛</div>
-<div class="logo">SD FOOD IMPORT</div>
-<p>PREMIUM QUALITY • BEST PRICE</p>
+<button class="menu" onclick="showPage('home')">☰</button>
+<div class="brand">♛ SD FOOD<small>IMPORT</small></div>
+<button class="headbtn" onclick="showPage('cart')">🛒 <span id="headCount">0</span></button>
 </header>
 
-<div class="search">
-<input id="search" placeholder="Mahsulot qidirish..." oninput="render()">
-</div>
-
-<div class="categories">
-<button onclick="filter('Barchasi')">Barchasi</button>
-<button onclick="filter('Ichimliklar')">Ichimliklar</button>
-<button onclick="filter('Shirinliklar')">Shirinliklar</button>
-<button onclick="filter('Oziq-ovqat')">Oziq-ovqat</button>
-</div>
-
 <main>
-<h2>✦ Mahsulotlar katalogi</h2>
-<div class="products" id="products"></div>
-<h2>✦ Savatingiz</h2>
-<div id="cartDetails"></div>
+<section id="home" class="page active">
+<div class="search"><input id="searchHome" placeholder="⌕ Mahsulot qidirish..." oninput="render()"></div>
+<div class="hero">
+<div><h2>Sifatli mahsulotlar — qulay xarid!</h2>
+<p>Eng yaxshi narxlar siz uchun!</p>
+<button onclick="showPage('catalog')">Buyurtma berish →</button></div>
+<div class="heroicon">🛒</div>
+</div>
+<div class="quick">
+<button onclick="filter('Oziq-ovqat')">🍎<span>Oziq-ovqat</span></button>
+<button onclick="filter('Ichimliklar')">🥤<span>Ichimliklar</span></button>
+<button onclick="filter('Shirinliklar')">🍬<span>Shirinliklar</span></button>
+<button onclick="showPage('catalog')">🏠<span>Barchasi</span></button>
+</div>
+<div class="sectiontitle"><h3>✦ Mashhur mahsulotlar</h3><button onclick="showPage('catalog')">Barchasi →</button></div>
+<div class="products" id="homeProducts"></div>
+</section>
+
+<section id="catalog" class="page">
+<div class="sectiontitle"><h3>Mahsulotlar katalogi</h3></div>
+<div class="search"><input id="searchCatalog" placeholder="⌕ Mahsulot qidirish..." oninput="render()"></div>
+<div class="categories" id="categories"></div>
+<div class="products" id="catalogProducts"></div>
+</section>
+
+<section id="cart" class="page">
+<div class="sectiontitle"><h3>🛒 Savat</h3><button onclick="clearCart()">Tozalash</button></div>
+<div id="cartItems"></div>
+<div class="totalbox">
+Jami:
+<strong id="cartTotal">0 so‘m</strong>
+<button class="goldbtn" onclick="showPage('checkout')">🛒 Buyurtma berish →</button>
+</div>
+</section>
+
+<section id="checkout" class="page">
+<div class="sectiontitle"><h3>Buyurtma berish</h3></div>
+<div class="field"><label>Ismingiz</label><input id="customerName" placeholder="Ism familiya"></div>
+<div class="field"><label>Telefon raqamingiz</label><input id="customerPhone" type="tel" placeholder="+998 90 123 45 67"></div>
+<div class="field"><label>Yetkazib berish manzili</label><input id="customerAddress" placeholder="Shahar, ko‘cha, uy"></div>
+<div class="field"><label>To‘lov usuli</label>
+<select id="payment" style="width:100%;padding:14px;background:#151922;color:white;border:1px solid #51401e;border-radius:12px">
+<option>Naqd pul</option><option>Plastik karta</option>
+</select></div>
+<div class="totalbox">Buyurtma jami: <strong id="checkoutTotal">0 so‘m</strong></div>
+<button class="goldbtn" onclick="placeOrder()">Buyurtmani tasdiqlash</button>
+</section>
+
+<section id="profile" class="page">
+<div class="sectiontitle"><h3>Profil</h3></div>
+<div class="profilebox"><div style="font-size:42px">👤</div><h3 id="profileName">Mening profilim</h3><p id="profilePhone">Telefon raqami</p></div>
+<div class="profilebox">
+<div class="profileitem" onclick="showPage('orders')">📦 Mening buyurtmalarim →</div>
+<div class="profileitem">📍 Manzillarim</div>
+<div class="profileitem">❤️ Sevimli mahsulotlar</div>
+<div class="profileitem">⚙️ Sozlamalar</div>
+</div>
+</section>
+
+<section id="orders" class="page">
+<div class="sectiontitle"><h3>Buyurtmalarim</h3></div>
+<div id="ordersList"></div>
+</section>
 </main>
 
-<div class="cart">
-<div>🛒 Savat: <strong id="count">0</strong> ta</div>
-<strong id="total">0 so‘m</strong>
-</div>
+<nav class="bottom">
+<button class="active" data-page="home" onclick="showPage('home')">⌂<span>Bosh sahifa</span></button>
+<button data-page="catalog" onclick="showPage('catalog')">▦<span>Katalog</span></button>
+<button data-page="cart" onclick="showPage('cart')">🛒<span>Savat</span></button>
+<button data-page="profile" onclick="showPage('profile')">♙<span>Profil</span></button>
+</nav>
 
 <script>
-let selected='Barchasi';
-let cart=[];
 let items=[];
+let cart={};
+let selected='Barchasi';
+const cats=['Barchasi','Oziq-ovqat','Ichimliklar','Shirinliklar','Non mahsulotlari','Go‘sht mahsulotlari','Sabzavotlar va mevalar','Maishiy tovarlar'];
 
+function safe(s){
+return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function money(n){return Number(n||0).toLocaleString('uz-UZ')+' so‘m'}
 function loadProducts(){
-try{
-items=JSON.parse(localStorage.getItem('sd_products')||'[]');
-if(!Array.isArray(items))items=[];
-}catch(e){items=[]}
+try{items=JSON.parse(localStorage.getItem('sd_products')||'[]');if(!Array.isArray(items))items=[]}
+catch(e){items=[]}
 render();
 }
-
-function filter(cat){
-selected=cat;
-render();
+function showPage(id){
+document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+document.getElementById(id).classList.add('active');
+document.querySelectorAll('.bottom button').forEach(b=>b.classList.toggle('active',b.dataset.page===id));
+if(id==='orders')renderOrders();
+if(id==='checkout')document.getElementById('checkoutTotal').textContent=money(cartTotal());
+window.scrollTo(0,0);
 }
-
-function money(n){
-return Number(n||0).toLocaleString('uz-UZ')+' so‘m';
-}
-
-function render(){
-const q=document.getElementById('search').value.toLowerCase();
-const list=items.filter(x=>{
-const name=String(x.name||'').toLowerCase();
-const category=String(x.cat||'Barchasi');
-return (selected==='Barchasi'||category===selected)&&name.includes(q);
-});
-
-document.getElementById('products').innerHTML=list.map(x=>{
-const i=items.indexOf(x);
-const photo=x.image
-?'<img src="'+escapeHTML(x.image)+'" alt="">'
-:'📦';
-return `<div class="card">
-<div class="photo">${photo}</div>
-<h3>${escapeHTML(x.name)}</h3>
-<div class="price">Oddiy: ${money(x.price)}</div>
+function filter(cat){selected=cat;showPage('catalog');render()}
+function productCard(x){
+let i=items.indexOf(x);
+let photo=x.image?'<img src="'+safe(x.image)+'" alt="">':'📦';
+return `<div class="card"><div class="photo">${photo}</div>
+<h4>${safe(x.name)}</h4><div class="price">${money(x.price)}</div>
 <div class="wholesale">Ulgurji: ${money(x.wholesale)}</div>
-<button onclick="add(${i})">Savatga qo‘shish</button>
-</div>`;
-}).join('')||'<div class="empty">Hozircha mahsulot yo‘q. Admin paneldan mahsulot qo‘shing.</div>';
+<button onclick="add(${i})">🛒 Savatga</button></div>`;
 }
-
+function render(){
+let q=(document.getElementById('searchHome')?.value||document.getElementById('searchCatalog')?.value||'').toLowerCase();
+let filtered=items.filter(x=>(selected==='Barchasi'||String(x.cat||'Barchasi')===selected)&&String(x.name||'').toLowerCase().includes(q));
+document.getElementById('homeProducts').innerHTML=items.slice(0,4).map(productCard).join('')||'<div class="empty">Mahsulotlar tez orada joylanadi</div>';
+document.getElementById('catalogProducts').innerHTML=filtered.map(productCard).join('')||'<div class="empty">Mahsulot topilmadi</div>';
+document.getElementById('categories').innerHTML=cats.map(c=>`<button class="${selected===c?'active':''}" onclick="filter('${c}')">${safe(c)}</button>`).join('');
+renderCart();
+}
 function add(i){
 if(!items[i])return;
-cart.push(items[i]);
-updateCart();
+let key=String(i);
+cart[key]=(cart[key]||0)+1;
+renderCart();
 }
-
-function updateCart(){
-document.getElementById('count').innerText=cart.length;
-document.getElementById('total').innerText=money(cart.reduce((s,x)=>s+Number(x.price||0),0));
-
-document.getElementById('cartDetails').innerHTML=cart.length
-?cart.map((x,i)=>`<div style="padding:10px;border-bottom:1px solid #554521">
-${escapeHTML(x.name)} — ${money(x.price)}
-<button onclick="removeCart(${i})" style="float:right">✕</button>
-</div>`).join('')
-:'<p style="color:#aaa">Savatingiz hozircha bo‘sh.</p>';
+function cartTotal(){
+return Object.entries(cart).reduce((s,[i,n])=>s+Number(items[Number(i)]?.price||0)*n,0);
 }
-
-function removeCart(i){
-cart.splice(i,1);
-updateCart();
+function renderCart(){
+let count=Object.values(cart).reduce((a,b)=>a+b,0);
+document.getElementById('headCount').textContent=count;
+document.getElementById('cartTotal').textContent=money(cartTotal());
+document.getElementById('cartItems').innerHTML=Object.entries(cart).filter(([i,n])=>n>0&&items[Number(i)]).map(([i,n])=>{
+let x=items[Number(i)];
+return `<div class="cartrow"><img class="cartphoto" src="${safe(x.image||'')}" onerror="this.style.display='none'">
+<div class="cartinfo"><b>${safe(x.name)}</b><p class="price">${money(x.price)}</p>
+<div class="qty"><button onclick="changeQty(${i},-1)">−</button>${n}<button onclick="changeQty(${i},1)">+</button></div></div>
+<button onclick="removeItem(${i})" style="background:none;color:#f66;border:0">✕</button></div>`;
+}).join('')||'<div class="empty">Savatingiz hozircha bo‘sh</div>';
 }
-
-function escapeHTML(s){
-return String(s||'').replace(/[&<>"']/g,c=>({
-'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
-}[c]));
+function changeQty(i,d){cart[i]=(cart[i]||0)+d;if(cart[i]<=0)delete cart[i];renderCart()}
+function removeItem(i){delete cart[i];renderCart()}
+function clearCart(){cart={};renderCart()}
+function placeOrder(){
+if(!Object.keys(cart).length)return alert('Savatingiz bo‘sh!');
+let name=document.getElementById('customerName').value.trim();
+let phone=document.getElementById('customerPhone').value.trim();
+let address=document.getElementById('customerAddress').value.trim();
+if(!name||!phone||!address)return alert('Ism, telefon va manzilni kiriting.');
+let products=Object.entries(cart).map(([i,n])=>({name:items[Number(i)].name,price:Number(items[Number(i)].price||0),quantity:n}));
+let order={id:Date.now(),name,phone,address,payment:document.getElementById('payment').value,products,total:cartTotal(),status:'Yangi',date:new Date().toLocaleString('uz-UZ')};
+let orders=[];
+try{orders=JSON.parse(localStorage.getItem('sd_orders')||'[]')}catch(e){}
+orders.push(order);
+localStorage.setItem('sd_orders',JSON.stringify(orders));
+let customers=[];
+try{customers=JSON.parse(localStorage.getItem('sd_customers')||'[]')}catch(e){}
+customers.push({name,phone,address});
+localStorage.setItem('sd_customers',JSON.stringify(customers));
+document.getElementById('profileName').textContent=name;
+document.getElementById('profilePhone').textContent=phone;
+cart={};renderCart();
+alert('Buyurtmangiz saqlandi!');
+showPage('orders');
 }
-
-window.addEventListener('storage',e=>{
-if(e.key==='sd_products')loadProducts();
-});
+function renderOrders(){
+let orders=[];
+try{orders=JSON.parse(localStorage.getItem('sd_orders')||'[]')}catch(e){}
+document.getElementById('ordersList').innerHTML=orders.filter(o=>o.phone===document.getElementById('customerPhone').value||true).slice().reverse().map(o=>`<div class="profilebox"><b>Buyurtma № ${o.id}</b><p>${safe(o.date)}</p><p>${safe(o.status)}</p><strong class="price">${money(o.total)}</strong></div>`).join('')||'<div class="empty">Hozircha buyurtmalar yo‘q</div>';
+}
+window.addEventListener('storage',e=>{if(e.key==='sd_products')loadProducts()});
 window.addEventListener('focus',loadProducts);
-
 loadProducts();
-updateCart();
 </script>
 </body>
 </html>

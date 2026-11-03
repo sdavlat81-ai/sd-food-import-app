@@ -20,12 +20,18 @@ h3{color:#d9b65e}
 .stat strong{display:block;color:#e3c16c;font-size:22px;margin-top:8px}
 input,select{width:100%;padding:13px;margin:7px 0;background:#222;color:white;border:1px solid #a88743;border-radius:8px}
 .action{background:#c6a04d;color:#111;border:0;padding:13px;border-radius:8px;font-weight:bold;width:100%;margin-top:8px}
-.item{padding:12px;background:#191919;border-bottom:1px solid #44391f;margin:8px 0;border-radius:8px}
-.small{font-size:12px;color:#aaa}
-.hidden{display:none}
+.item{padding:14px;background:#191919;border:1px solid #44391f;margin:10px 0;border-radius:8px}
+.small{font-size:12px;color:#aaa;margin-top:6px}
+.hidden{display:none!important}
+.order-btn{width:100%;text-align:left;background:#191919;color:white;border:1px solid #8e7137;padding:15px;border-radius:9px;margin:7px 0}
+.order-btn b{color:#e3c16c}
+.detail{background:#191919;border:1px solid #c5a04c;border-radius:12px;padding:16px;margin-top:15px}
+.detail p{border-bottom:1px solid #44391f;padding:8px 0;overflow-wrap:anywhere}
+.close{background:#444;color:white;border:0;padding:12px;border-radius:8px;width:100%;margin-top:10px}
 </style>
 </head>
 <body>
+
 <header>
 <div style="font-size:35px">♛</div>
 <h2>SD FOOD IMPORT</h2>
@@ -64,12 +70,13 @@ input,select{width:100%;padding:13px;margin:7px 0;background:#222;color:white;bo
 
 <section id="orders" class="hidden">
 <h3>✦ Buyurtmalar</h3>
-<div id="orderList">Hozircha buyurtmalar yo‘q.</div>
+<div id="orderList"></div>
+<div id="orderDetail" class="detail hidden"></div>
 </section>
 
 <section id="customers" class="hidden">
 <h3>✦ Mijozlar</h3>
-<div id="customerList">Hozircha mijozlar yo‘q.</div>
+<div id="customerList"></div>
 </section>
 
 <script>
@@ -81,10 +88,13 @@ function save(){
 localStorage.setItem('sd_products',JSON.stringify(products));
 update();
 }
+
 function show(id){
 ['home','products','orders','customers'].forEach(x=>
 document.getElementById(x).classList.toggle('hidden',x!==id));
+if(id==='orders') renderOrders();
 }
+
 function addProduct(){
 let n=document.getElementById('name').value.trim();
 let p=Number(document.getElementById('price').value);
@@ -98,32 +108,105 @@ document.getElementById('price').value='';
 document.getElementById('wholesale').value='';
 document.getElementById('image').value='';
 }
+
 function removeProduct(i){
 if(confirm('Mahsulotni o‘chirasizmi?')){
 products.splice(i,1);save();
 }
 }
+
+function val(v){
+if(v===undefined||v===null||v==='') return 'Kiritilmagan';
+if(typeof v==='object') return Object.values(v).join(' ');
+return String(v);
+}
+
+function money(v){
+return (Number(v)||0).toLocaleString('uz-UZ')+' so‘m';
+}
+
 function update(){
 document.getElementById('productCount').innerText=products.length;
 document.getElementById('orderCount').innerText=orders.length;
 document.getElementById('customerCount').innerText=customers.length;
-document.getElementById('sales').innerText=orders.reduce((s,o)=>s+(Number(o.total)||0),0).toLocaleString('uz-UZ')+' so‘m';
+document.getElementById('sales').innerText=money(
+orders.reduce((s,o)=>s+(Number(o.total)||0),0)
+);
+
 document.getElementById('productList').innerHTML=products.map((p,i)=>
 `<div class="item"><b>${escapeHTML(p.name)}</b>
-<div class="small">Oddiy: ${p.price.toLocaleString('uz-UZ')} so‘m</div>
-<div class="small">Ulgurji: ${p.wholesale.toLocaleString('uz-UZ')} so‘m</div>
+<div class="small">Oddiy: ${money(p.price)}</div>
+<div class="small">Ulgurji: ${money(p.wholesale)}</div>
 <button class="action" onclick="removeProduct(${i})">O‘chirish</button></div>`
 ).join('')||'Mahsulotlar yo‘q';
-document.getElementById('orderList').innerHTML=orders.map(o=>
-`<div class="item">${escapeHTML(o.customer||'Mijoz')} — ${Number(o.total||0).toLocaleString('uz-UZ')} so‘m</div>`
-).join('')||'Hozircha buyurtmalar yo‘q.';
+
+renderOrders();
+
 document.getElementById('customerList').innerHTML=customers.map(c=>
-`<div class="item">${escapeHTML(c.name||'Mijoz')} — ${escapeHTML(c.phone||'')}</div>`
+`<div class="item">
+<b>${escapeHTML(val(c.name||c.customer))}</b>
+<div class="small">${escapeHTML(val(c.phone))}</div>
+</div>`
 ).join('')||'Hozircha mijozlar yo‘q.';
 }
-function escapeHTML(s){
-return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+function renderOrders(){
+document.getElementById('orderList').innerHTML=orders.map((o,i)=>
+`<button class="order-btn" onclick="openOrder(${i})">
+<b>Buyurtma №${i+1}</b>
+<div>${escapeHTML(val(o.customer||o.name))}</div>
+<div class="small">${money(o.total)}</div>
+<div class="small">Batafsil ko‘rish uchun bosing →</div>
+</button>`
+).join('')||'Hozircha buyurtmalar yo‘q.';
 }
+
+function openOrder(i){
+let o=orders[i];
+let customer=typeof o.customer==='object' ? o.customer : {};
+let name=customer.name||o.customer||o.name;
+let phone=customer.phone||o.phone;
+let address=o.address||o.deliveryAddress||o.location||customer.address;
+let items=o.items||o.products||o.cart||[];
+
+let itemHTML='Ma’lumot saqlanmagan.';
+if(Array.isArray(items)&&items.length){
+itemHTML=items.map(item=>{
+let n=item.name||item.product||item.title||'Mahsulot';
+let q=item.quantity||item.qty||1;
+let p=item.price||0;
+return `<p>${escapeHTML(val(n))} — ${escapeHTML(val(q))} dona<br>
+<span class="small">${money(p)}</span></p>`;
+}).join('');
+}
+
+let detail=document.getElementById('orderDetail');
+detail.innerHTML=`
+<h3>✦ Buyurtma №${i+1}</h3>
+<p><b>Mijoz:</b> ${escapeHTML(val(name))}</p>
+<p><b>Telefon:</b> ${escapeHTML(val(phone))}</p>
+<p><b>Yetkazib berish manzili:</b><br>${escapeHTML(val(address))}</p>
+<h3>Mahsulotlar</h3>
+${itemHTML}
+<p><b>Umumiy summa:</b> ${money(o.total)}</p>
+<p><b>Sana:</b> ${escapeHTML(val(o.date||o.createdAt))}</p>
+<p><b>Holati:</b> ${escapeHTML(val(o.status||'Yangi buyurtma'))}</p>
+<button class="close" onclick="closeOrder()">Yopish</button>
+`;
+detail.classList.remove('hidden');
+detail.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function closeOrder(){
+document.getElementById('orderDetail').classList.add('hidden');
+}
+
+function escapeHTML(s){
+return String(s).replace(/[&<>"']/g,c=>({
+'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+}[c]));
+}
+
 update();
 </script>
 </body>
